@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimisateur de découpage IA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        label {
+            width: 220px;
+            margin-right: 15px;
+            color: #34495e;
+            font-weight: 500;
+        }
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s, background 0.3s;
+            display: block;
+            margin: 10px auto;
+        }
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #ecf5fc;
+            text-align: center;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Optimisateur de Découpage IA 🧠</h1>
+        
+        <div class="input-group">
+            <label for="C">Capacité de l'IA (tokens)</label>
+            <input type="number" id="C" value="10000" min="1000" step="1000">
+        </div>
+        <div class="input-group">
+            <label for="F">Complexité structurelle (0-1)</label>
+            <input type="number" id="F" value="0.7" min="0" max="1" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="W">Mots par page</label>
+            <input type="number" id="W" value="450" min="50" step="50">
+        </div>
+        <div class="input-group">
+            <label for="S">Complexité sémantique (1-2)</label>
+            <input type="number" id="S" value="1.6" min="1" max="2" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="I">Éléments non-textuels/page</label>
+            <input type="number" id="I" value="1" min="0" step="1">
+        </div>
+        
+        <button onclick="onCalculate()">Calculer le découpage optimal</button>
+        <button onclick="resetFields()">Réinitialiser</button>
+        <button onclick="exportToPDF()">Exporter en PDF</button>
+
+        <div class="result" id="result">
+            Chargement des recommandations...
+        </div>
+    </div>
+
+    <script>
+        function calculateMaxPages(C, F, W, S, I) {
+            const maxTokens = C * (1 - F);
+            const tokensPerPage = (W * S) + (I * 0.5);
+            return Math.max(1, Math.round(maxTokens / tokensPerPage));
+        }
+
+        function onCalculate() {
+            const config = {
+                C: parseFloat(document.getElementById('C').value),
+                F: parseFloat(document.getElementById('F').value),
+                W: parseFloat(document.getElementById('W').value),
+                S: parseFloat(document.getElementById('S').value),
+                I: parseFloat(document.getElementById('I').value)
+            };
+            const result = calculateMaxPages(config.C, config.F, config.W, config.S, config.I);
+            document.getElementById('result').innerHTML = `<strong>${result} pages/segment</strong>`;
+        }
+
+        function resetFields() {
+            document.getElementById('C').value = 10000;
+            document.getElementById('F').value = 0.7;
+            document.getElementById('W').value = 450;
+            document.getElementById('S').value = 1.6;
+            document.getElementById('I').value = 1;
+            document.getElementById('result').innerHTML = "Chargement des recommandations...";
+        }
+
+        function exportToPDF() {
+            const resultText = document.getElementById('result').innerText;
+            const pdfContent = `
+                Optimisateur de Découpage IA - Résultat
+                ----------------------------------------
+                ${resultText}
+            `;
+
+            const blob = new Blob([pdfContent], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "resultat_decoupage.pdf";
+            link.click();
+        }
+    </script>
+</body>
+</html>
